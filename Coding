@@ -1,0 +1,259 @@
+Option Explicit
+Dim strSheetND As String
+Dim strSheet As String
+Sub EmailAttach()
+'For Tips see: http://www.rondebruin.nl/win/winmail/Outlook/tips.htm
+'Working in Excel 2000-2016
+    Dim rng As Range
+    Dim OutApp As Object
+    Dim OutMail As Object
+    Dim OutLookApp As Object
+'from second macro
+    Dim rngTo As Range
+    Dim rngCC As Range
+    Dim rngSubject As Range
+    Dim rngBody As Range
+    Dim body_1st, body_2nd, body_3rd, body_4th As String
+    Dim StrBody, strFilePath As String
+    Dim StrEndBody As String
+    
+    
+ 'for dynamic row range selection
+ Dim rows As Integer
+ Dim rngrows As Range
+ Dim rowstwice As Integer
+    
+    Set rng = Nothing
+    On Error Resume Next
+    
+   
+    'Only the visible cells in the selection
+    
+    Set rng = Range(Sheet6.Range("B2"), Sheet6.Range("F" & Cells.rows.Count).End(xlUp))
+    
+    With Application
+        .EnableEvents = False
+        .ScreenUpdating = False
+    End With
+
+    Set OutApp = CreateObject("Outlook.Application")
+    Set OutMail = OutApp.CreateItem(0)
+
+    On Error Resume Next
+    
+    With Sheet6
+    Set rngTo = .Range("B8")
+    Set rngCC = .Range("B9")
+
+        
+End With
+
+
+StrBody = "<br>" & strSheet & " -> " & Format(Sheet6.Range("B3").Value, "DD-mmm-YYYY") & "-> BMO Collateral" & "<br>"
+
+StrEndBody = "<br>" & "<br>" & _
+"OTC Collateral Desk | Collateral Management Group | Global Middle Office" & "<br>" & _
+"BMO Capital Markets | 100 King St. West | 17th Floor | Toronto, ON M5X 1H3" & "<br>" & _
+"Collateral@BMO.com"
+
+strFilePath = Sheet6.Range("B13").Value
+
+    With OutMail
+        '.SentOnBehalfOfName = """Collateral Management"" <Collateral@bmo.com>"
+        .To = rngTo.Value
+        .CC = rngCC.Value
+        .Subject = strSheet & " -> " & Format(Sheet6.Range("B3").Value, "DD-mmm-YYYY") & "-> BMO Collateral"
+        .HTMLBody = StrBody & StrEndBody
+        .Attachments.Add strFilePath
+        .Signature
+        .Importance = 2
+        .Display
+    End With
+    On Error GoTo 0
+
+    With Application
+        .EnableEvents = True
+        .ScreenUpdating = True
+    End With
+
+    Set OutMail = Nothing
+    Set OutApp = Nothing
+     Set rngTo = Nothing
+    Set rngSubject = Nothing
+    Set rngBody = Nothing
+
+
+
+'Check if outlook is not running or not installed
+    On Error Resume Next
+    Set OutLookApp = GetObject(, "Outlook.Application")
+    If Err.Number = 429 Then 'Outlook is NOT running
+        Err.Clear
+        Set OutLookApp = CreateObject("Outlook.Application") 'Start Outlook
+        If Err.Number = 429 Then 'MS Outlook is not installed
+            MsgBox "MS Outlook is not installed on your computer. ", vbOKOnly + vbCritical
+            Exit Sub
+        End If
+    End If
+
+
+End Sub
+
+Sub EmailNXAttach()
+'For Tips see: http://www.rondebruin.nl/win/winmail/Outlook/tips.htm
+'Working in Excel 2000-2016
+    Dim rng As Range
+    Dim OutApp As Object
+    Dim OutMail As Object
+    Dim OutLookApp As Object
+'from second macro
+    Dim rngTo As Range
+    Dim rngCC As Range
+    Dim rngSubject As Range
+    Dim rngBody As Range
+    Dim body_1st, body_2nd, body_3rd, body_4th As String
+    Dim StrBody, strFilePath As String
+    Dim StrEndBody As String
+    
+    
+ 'for dynamic row range selection
+ Dim rows As Integer
+ Dim rngrows As Range
+ Dim rowstwice As Integer
+    
+    Set rng = Nothing
+    On Error Resume Next
+    
+   
+    'Only the visible cells in the selection
+    
+    Set rng = Range(Sheet6.Range("B2"), Sheet6.Range("F" & Cells.rows.Count).End(xlUp))
+    
+    With Application
+        .EnableEvents = False
+        .ScreenUpdating = False
+    End With
+
+    Set OutApp = CreateObject("Outlook.Application")
+    Set OutMail = OutApp.CreateItem(0)
+
+    On Error Resume Next
+    
+    With Sheet6
+    Set rngTo = .Range("B8")
+    Set rngCC = .Range("B9")
+
+        
+End With
+
+
+StrBody = "<br>" & strSheetND & " -> " & Format(Sheet6.Range("B4").Value, "DD-mmm-YYYY") & "-> BMO Collateral" & "<br>"
+
+StrEndBody = "<br>" & "<br>" & _
+"OTC Collateral Desk | Collateral Management Group | Global Middle Office" & "<br>" & _
+"BMO Capital Markets | 100 King St. West | 17th Floor | Toronto, ON M5X 1H3" & "<br>" & _
+"Collateral@BMO.com"
+
+strFilePath = Sheet6.Range("B13").Value
+
+    With OutMail
+        '.SentOnBehalfOfName = """Collateral Management"" <Collateral@bmo.com>"
+        .To = rngTo.Value
+        .CC = rngCC.Value
+        .Subject = strSheetND & " -> " & Format(Sheet6.Range("B4").Value, "DD-mmm-YYYY") & "-> BMO Collateral"
+        .HTMLBody = StrBody & StrEndBody
+        .Attachments.Add strFilePath
+        .Signature
+        .Importance = 2
+        .Display
+    End With
+    On Error GoTo 0
+
+    With Application
+        .EnableEvents = True
+        .ScreenUpdating = True
+    End With
+
+    Set OutMail = Nothing
+    Set OutApp = Nothing
+     Set rngTo = Nothing
+    Set rngSubject = Nothing
+    Set rngBody = Nothing
+
+
+
+'Check if outlook is not running or not installed
+    On Error Resume Next
+    Set OutLookApp = GetObject(, "Outlook.Application")
+    If Err.Number = 429 Then 'Outlook is NOT running
+        Err.Clear
+        Set OutLookApp = CreateObject("Outlook.Application") 'Start Outlook
+        If Err.Number = 429 Then 'MS Outlook is not installed
+            MsgBox "MS Outlook is not installed on your computer. ", vbOKOnly + vbCritical
+            Exit Sub
+        End If
+    End If
+
+
+End Sub
+
+
+
+Sub EmailND1()
+strSheetND = "1st Sheet"
+Call EmailNXAttach
+
+End Sub
+
+Sub EmailND2()
+strSheetND = "2nd Sheet"
+Call EmailNXAttach
+
+End Sub
+
+Sub EmailND3()
+strSheetND = "3rd Sheet"
+Call EmailNXAttach
+
+End Sub
+
+Sub EmailND4()
+strSheetND = "4th Sheet"
+Call EmailNXAttach
+
+End Sub
+Sub EmailND5()
+strSheetND = "5th Sheet"
+Call EmailNXAttach
+
+End Sub
+
+Sub Email1()
+strSheet = "1st Sheet"
+Call EmailAttach
+
+End Sub
+
+Sub Email2()
+strSheet = "2nd Sheet"
+Call EmailAttach
+End Sub
+
+Sub Email3()
+strSheet = "3rd Sheet"
+Call EmailAttach
+
+End Sub
+
+Sub Email4()
+strSheet = "4th Sheet"
+Call EmailAttach
+
+End Sub
+Sub Email5()
+strSheet = "5th Sheet"
+Call EmailAttach
+
+End Sub
+
+
