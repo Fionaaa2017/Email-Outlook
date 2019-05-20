@@ -257,3 +257,156 @@ Call EmailAttach
 End Sub
 
 
+Sub EmailMBS()
+'For Tips see: http://www.rondebruin.nl/win/winmail/Outlook/tips.htm
+'Don't forget to copy the function RangetoHTML in the module.
+'Working in Excel 2000-2016
+    Dim rng As Range
+    Dim OutApp As Object
+    Dim OutMail As Object
+'from second macro
+    Dim rngTo As Range
+    Dim rngCC As Range
+    Dim rngSubject As Range
+    Dim rngBody As Range
+    Dim body_1st, body_2nd, body_3rd, body_4th As String
+    Dim StrBody As String
+    Dim StrEndBody As String
+    
+    
+ 'for dynamic row range selection
+ Dim rows As Integer
+ Dim rngrows As Range
+ Dim rowstwice As Integer
+    
+    Set rng = Nothing
+    On Error Resume Next
+    
+   
+    'Only the visible cells in the selection
+    
+    Set rng = Range(Sheet4.Range("B2"), Sheet4.Range("F" & Cells.rows.Count).End(xlUp))
+    
+    With Application
+        .EnableEvents = False
+        .ScreenUpdating = False
+    End With
+
+    Set OutApp = CreateObject("Outlook.Application")
+    Set OutMail = OutApp.CreateItem(0)
+
+    On Error Resume Next
+    
+    With Sheet4
+    Set rngTo = .Range("O1")
+    Set rngCC = .Range("O2")
+
+        
+End With
+
+
+StrBody = "Hello," & "<br>" & "<br>" & "Below are the following movements for today:" & "<br>"
+
+StrEndBody = "<br>" & "Trades have been uploaded, awaiting approval" & "<br>" & "<br>" & _
+"OTC Collateral Desk | Collateral Management Group | Global Middle Office" & "<br>" & _
+"BMO Capital Markets | 100 King St. West | 17th Floor | Toronto, ON M5X 1H3" & "<br>" & _
+"Collateral@BMO.com"
+
+
+    With OutMail
+        '.SentOnBehalfOfName = """Collateral Management"" <Collateral@bmo.com>"
+        .To = rngTo.Value
+        .CC = rngCC.Value
+        .Subject = "Trades with Repo Tracking Code for settlement " & Format(Sheet4.Range("O5").Value, "mmm d,yyyy")
+        .HTMLBody = StrBody & RangetoHTML(rng) & StrEndBody
+        .Signature
+        .Display
+    End With
+    On Error GoTo 0
+
+    With Application
+        .EnableEvents = True
+        .ScreenUpdating = True
+    End With
+
+    Set OutMail = Nothing
+    Set OutApp = Nothing
+     Set rngTo = Nothing
+    Set rngSubject = Nothing
+    Set rngBody = Nothing
+
+
+
+'Check if outlook is not running or not installed
+    On Error Resume Next
+    Set OutLookApp = GetObject(, "Outlook.Application")
+    If Err.Number = 429 Then 'Outlook is NOT running
+        Err.Clear
+        Set OutLookApp = CreateObject("Outlook.Application") 'Start Outlook
+        If Err.Number = 429 Then 'MS Outlook is not installed
+            MsgBox "MS Outlook is not installed on your computer. ", vbOKOnly + vbCritical
+            Exit Sub
+        End If
+    End If
+
+
+
+
+End Sub
+
+
+
+Function RangetoHTML(rng As Range)
+' Changed by Ron de Bruin 28-Oct-2006
+' Working in Office 2000-2016
+    Dim fso As Object
+    Dim ts As Object
+    Dim TempFile As String
+    Dim TempWB As Workbook
+
+    TempFile = Environ$("temp") & "\" & Format(Now, "dd-mm-yy h-mm-ss") & ".htm"
+
+    'Copy the range and create a new workbook to past the data in
+    rng.Copy
+    Set TempWB = Workbooks.Add(1)
+    With TempWB.Sheets(1)
+        .Cells(1).PasteSpecial Paste:=8
+        .Cells(1).PasteSpecial xlPasteValues, , False, False
+        .Cells(1).PasteSpecial xlPasteFormats, , False, False
+        .Cells(1).Select
+        Application.CutCopyMode = False
+        On Error Resume Next
+        .DrawingObjects.Visible = True
+        .DrawingObjects.Delete
+        On Error GoTo 0
+    End With
+
+    'Publish the sheet to a htm file
+    With TempWB.PublishObjects.Add( _
+         SourceType:=xlSourceRange, _
+         Filename:=TempFile, _
+         Sheet:=TempWB.Sheets(1).Name, _
+         Source:=TempWB.Sheets(1).UsedRange.Address, _
+         HtmlType:=xlHtmlStatic)
+        .Publish (True)
+    End With
+
+    'Read all data from the htm file into RangetoHTML
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set ts = fso.GetFile(TempFile).OpenAsTextStream(1, -2)
+    RangetoHTML = ts.ReadAll
+    ts.Close
+    RangetoHTML = Replace(RangetoHTML, "align=center x:publishsource=", _
+                          "align=left x:publishsource=")
+
+    'Close TempWB
+    TempWB.Close savechanges:=False
+
+    'Delete the htm file we used in this function
+    Kill TempFile
+
+    Set ts = Nothing
+    Set fso = Nothing
+    Set TempWB = Nothing
+End Function
+
